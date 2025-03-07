@@ -1,0 +1,14 @@
+database:
+  host: "db" # add 'localhost' if launch app in local
+  port: 5432
+
+jwt:
+  access_token_expiry: 15m
+  refresh_token_expiry: 7d
+
+smtp:
+  host: "smtp" # add 'localhost' if launch app in local
+  port: 1025
+  username: ""
+  password: ""
+  from: "no-reply@example.com"
