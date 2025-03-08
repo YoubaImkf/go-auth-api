@@ -42,6 +42,24 @@ Edit `configs/config.yaml` to configure database and SMTP settings.
 
 2. Access the API at `http://localhost:8080`.
 
+### Running Locally
+
+To run the application locally without Docker:
+
+1. Ensure you updated the **docker-compose.yml** and **config.yml** files as comments suggest it !
+
+2. Ensure PostgreSQL and MailDev are running:
+
+    ```sh
+    docker-compose up db smtp -d
+    ```
+
+3. Run the application:
+
+    ```sh
+    go run cmd/api/main.go
+    ```
+
 ### Swagger Documentation
 
 Access the Swagger UI at `http://localhost:8080/swagger/index.html`.
