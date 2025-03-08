@@ -18,7 +18,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # Comment 'app' section if you want to run API on local
+  # Comment 'app' section if you want to run API on your local
   app:
     build: .
     container_name: go-auth-api
