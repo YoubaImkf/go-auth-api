@@ -94,6 +94,8 @@ func (a *App) setupRoutes() {
 	apiGroup := a.router.Group(groupUUID)
 
 	apiGroup.GET("api/v1/health", healthController.Health)
+	apiGroup.GET("/api/v1/users", userController.GetAllUsers)
+
 	authGroup := apiGroup.Group("/api/v1/auth")
 	authGroup.POST("/register", authController.Register)
 	authGroup.POST("/login", authController.Login)
@@ -104,9 +106,6 @@ func (a *App) setupRoutes() {
 	protected.Use(middleware.AuthMiddleware(blacklistRepo))
 	protected.POST("/auth/logout", authController.Logout)
 	protected.GET("/auth/me", authController.GetProfile)
-
-	// User routes
-	a.router.GET("/api/v1/users", userController.GetAllUsers)
 }
 
 func (a *App) Run() {
