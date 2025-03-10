@@ -18,15 +18,15 @@ import (
 type AuthService struct {
 	userRepository repository.UserRepository
 	blacklistRepo  repository.BlacklistRepository
-	emailService   *EmailService
+	emailService   EmailService
 	jwtSecret      string
 }
 
-func NewAuthService(userRepo repository.UserRepository, blacklistRepo repository.BlacklistRepository) *AuthService {
+func NewAuthService(userRepo repository.UserRepository, blacklistRepo repository.BlacklistRepository, emailService EmailService) *AuthService {
 	return &AuthService{
 		userRepository: userRepo,
 		blacklistRepo:  blacklistRepo,
-		emailService:   NewEmailService(),
+		emailService:   emailService,
 		jwtSecret:      viper.GetString("jwt.secret"),
 	}
 }
