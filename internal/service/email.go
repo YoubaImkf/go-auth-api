@@ -7,7 +7,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-type EmailService struct {
+type EmailService interface {
+	SendPasswordResetEmail(to, token string) error
+}
+
+type emailService struct {
 	host     string
 	port     int
 	username string
@@ -15,8 +19,8 @@ type EmailService struct {
 	from     string
 }
 
-func NewEmailService() *EmailService {
-	return &EmailService{
+func NewEmailService() EmailService {
+	return &emailService{
 		host:     viper.GetString("smtp.host"),
 		port:     viper.GetInt("smtp.port"),
 		username: viper.GetString("smtp.username"),
@@ -25,7 +29,7 @@ func NewEmailService() *EmailService {
 	}
 }
 
-func (s *EmailService) SendPasswordResetEmail(to, token string) error {
+func (s *emailService) SendPasswordResetEmail(to, token string) error {
 	var auth smtp.Auth
 	if s.username != "" && s.password != "" {
 		auth = smtp.PlainAuth("", s.username, s.password, s.host)

@@ -78,10 +78,13 @@ func (a *App) initDB() {
 func (a *App) setupRoutes() {
 	blacklistRepo := repository.NewPostgresBlacklistRepository(a.db)
 	userRepo := repository.NewPostgresUserRepository(a.db)
-	authService := service.NewAuthService(userRepo, blacklistRepo)
+	emailService := service.NewEmailService()
+	authService := service.NewAuthService(userRepo, blacklistRepo, emailService)
+	userService := service.NewUserService(userRepo)
 
 	healthController := controller.NewHealthController()
 	authController := controller.NewAuthController(authService)
+	userController := controller.NewUserController(userService)
 
 	a.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	a.router.GET("/api/v1/health", healthController.Health)
@@ -97,7 +100,11 @@ func (a *App) setupRoutes() {
 	protected.Use(middleware.AuthMiddleware(blacklistRepo))
 	protected.POST("/auth/logout", authController.Logout)
 	protected.GET("/auth/me", authController.GetProfile)
+
+	// User routes
+	a.router.GET("/api/v1/users", userController.GetAllUsers)
 }
+
 func (a *App) Run() {
 	a.router.Run(":8080")
 }

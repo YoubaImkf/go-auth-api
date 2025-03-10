@@ -15,6 +15,7 @@ type UserRepository interface {
 	StorePasswordResetToken(email, token string, expiry time.Time) error
 	FindEmailByResetToken(token string) (string, error)
 	UpdatePassword(email, newPassword string) error
+	GetAll() ([]model.User, error)
 }
 
 type PostgresUserRepository struct {
@@ -69,4 +70,12 @@ func (r *PostgresUserRepository) FindEmailByResetToken(token string) (string, er
 
 func (r *PostgresUserRepository) UpdatePassword(email, newPassword string) error {
 	return r.db.Model(&model.User{}).Where("email = ?", email).Update("password", newPassword).Error
+}
+
+func (r *PostgresUserRepository) GetAll() ([]model.User, error) {
+	var users []model.User
+	if err := r.db.Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
 }
