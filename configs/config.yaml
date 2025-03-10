@@ -12,3 +12,6 @@ smtp:
   username: ""
   password: ""
   from: "no-reply@example.com"
+
+group:
+  uuid: "/03622bf7-d58b-4997-965c-14ee58c63554"
