@@ -61,20 +61,20 @@ func (a *App) loadConfig() {
 		log.Printf("Error binding DATABASE_HOST: %v", err)
 	}
 	if err := viper.BindEnv("database.port", "DATABASE_PORT"); err != nil {
-		log.Printf("Error binding SMTP_HOST: %v", err)
+		log.Printf("Error binding DATABASE_PORT: %v", err)
 	}
 
 	if err := viper.BindEnv("smtp.host", "SMTP_HOST"); err != nil {
 		log.Printf("Error binding SMTP_HOST: %v", err)
 	}
 	if err := viper.BindEnv("smtp.port", "SMTP_PORT"); err != nil {
-		log.Printf("Error binding DATABASE_HOST: %v", err)
+		log.Printf("Error binding SMTP_PORT: %v", err)
 	}
 	if err := viper.BindEnv("smtp.username", "SMTP_USERNAME"); err != nil {
-		log.Printf("Error binding DATABASE_HOST: %v", err)
+		log.Printf("Error binding SMTP_USERNAME: %v", err)
 	}
 	if err := viper.BindEnv("smtp.password", "SMTP_PASSWORD"); err != nil {
-		log.Printf("Error binding DATABASE_HOST: %v", err)
+		log.Printf("Error binding SMTP_PASSWORD: %v", err)
 	}
 
 }
@@ -83,9 +83,9 @@ func (a *App) initDB() {
 	config := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
 		viper.GetString("database.host"),
 		viper.GetInt("database.port"),
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_DB"),
-		os.Getenv("POSTGRES_PASSWORD"),
+		os.Getenv("DATABASE_USER"),
+		os.Getenv("DATABASE_NAME"),
+		os.Getenv("DATABASE_PASSWORD"),
 	)
 
 	db, err := gorm.Open("postgres", config)
