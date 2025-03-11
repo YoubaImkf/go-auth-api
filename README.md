@@ -25,7 +25,16 @@ Create a `.env` file with the following content:
 POSTGRES_USER={root}
 POSTGRES_PASSWORD={root}
 POSTGRES_DB={db}
+
 JWT_SECRET={your_jwt_secret_here}
+
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+
+SMTP_HOST=localhost
+SMTP_PORT=1025
+SMTP_USERNAME=
+SMTP_PASSWORD=
 ```
 
 ### Configuration
@@ -41,6 +50,8 @@ Edit `configs/config.yaml` to configure database and SMTP settings.
     ```
 
 2. Access the API at `http://localhost:8080`.
+
+3. Access the SMTP at `http://localhost:1080`.
 
 ### Running Locally
 
@@ -68,16 +79,21 @@ Access the Swagger UI at `http://localhost:8080/swagger/index.html`.
 
 ### Auth
 
-- `POST /api/v1/auth/register` - Register a new user
-- `POST /api/v1/auth/login` - Authenticate a user
-- `POST /api/v1/auth/forgot-password` - Request a password reset
-- `POST /api/v1/auth/reset-password` - Reset the user's password
-- `POST /api/v1/auth/logout` - Logout a user (protected)
-- `GET /api/v1/auth/me` - Get user profile (protected)
+- `POST /{UUID}/auth/register` - Register a new user
+- `POST /{UUID}/auth/login` - Authenticate a user
+- `POST /{UUID}/auth/forgot-password` - Request a password reset
+- `POST /{UUID}/auth/reset-password` - Reset the user's password
+- `POST /{UUID}/auth/logout` - Logout a user (protected)
+- `GET /{UUID}/auth/me` - Get user profile (protected)
 
 ### Health
 
-- `GET /api/v1/health` - Check the health of the service
+- `GET /{UUID}/health` - Check the health of the service
+
+### USer
+
+- `GET /{UUID}/users` - Check the health of the service
+
 
 ## 🧪 Running Tests
 
