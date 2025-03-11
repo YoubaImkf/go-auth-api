@@ -55,6 +55,28 @@ func (a *App) loadConfig() {
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file, %s", err)
 	}
+
+	// Bind specific environment variables to override config values
+	if err := viper.BindEnv("database.host", "DATABASE_HOST"); err != nil {
+		log.Printf("Error binding DATABASE_HOST: %v", err)
+	}
+	if err := viper.BindEnv("database.port", "DATABASE_PORT"); err != nil {
+		log.Printf("Error binding SMTP_HOST: %v", err)
+	}
+
+	if err := viper.BindEnv("smtp.host", "SMTP_HOST"); err != nil {
+		log.Printf("Error binding SMTP_HOST: %v", err)
+	}
+	if err := viper.BindEnv("smtp.port", "SMTP_PORT"); err != nil {
+		log.Printf("Error binding DATABASE_HOST: %v", err)
+	}
+	if err := viper.BindEnv("smtp.username", "SMTP_USERNAME"); err != nil {
+		log.Printf("Error binding DATABASE_HOST: %v", err)
+	}
+	if err := viper.BindEnv("smtp.password", "SMTP_PASSWORD"); err != nil {
+		log.Printf("Error binding DATABASE_HOST: %v", err)
+	}
+
 }
 
 func (a *App) initDB() {
@@ -96,7 +118,7 @@ func (a *App) setupRoutes() {
 	// Group routes under the UUID
 	apiGroup := a.router.Group(groupUUID)
 
-	apiGroup.GET("health", healthController.Health)
+	apiGroup.GET("/health", healthController.Health)
 	apiGroup.GET("/users", userController.GetAllUsers)
 
 	authGroup := apiGroup.Group("/auth")
