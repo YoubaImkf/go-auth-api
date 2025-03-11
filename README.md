@@ -22,19 +22,23 @@ A JWT Authentication Service API built with Go, Gin, and Gorm.
 Create a `.env` file with the following content:
 
 ```env
-POSTGRES_USER={root}
-POSTGRES_PASSWORD={root}
-POSTGRES_DB={db}
+APP_ENVIRONMENT=development
 
-JWT_SECRET={your_jwt_secret_here}
-
+# Database configuration for PostgreSQL
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
+DATABASE_USER=root
+DATABASE_PASSWORD=root
+DATABASE_NAME=go-auth-db
 
+# SMTP configuration
 SMTP_HOST=localhost
 SMTP_PORT=1025
 SMTP_USERNAME=
 SMTP_PASSWORD=
+
+# JWT secret
+JWT_SECRET={secret}
 ```
 
 ### Configuration
