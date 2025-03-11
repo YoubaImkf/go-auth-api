@@ -411,7 +411,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
-	BasePath:         "/03622bf7-d58b-4997-965c-14ee58c63554/api/v1",
+	BasePath:         "/03622bf7-d58b-4997-965c-14ee58c63554/",
 	Schemes:          []string{},
 	Title:            "Authentication API",
 	Description:      "A JWT Authentication Service API",

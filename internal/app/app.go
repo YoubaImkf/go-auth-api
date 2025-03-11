@@ -93,16 +93,16 @@ func (a *App) setupRoutes() {
 	// Group routes under the UUID
 	apiGroup := a.router.Group(groupUUID)
 
-	apiGroup.GET("api/v1/health", healthController.Health)
-	apiGroup.GET("/api/v1/users", userController.GetAllUsers)
+	apiGroup.GET("health", healthController.Health)
+	apiGroup.GET("/users", userController.GetAllUsers)
 
-	authGroup := apiGroup.Group("/api/v1/auth")
+	authGroup := apiGroup.Group("/auth")
 	authGroup.POST("/register", authController.Register)
 	authGroup.POST("/login", authController.Login)
 	authGroup.POST("/forgot-password", authController.ForgotPassword)
 	authGroup.POST("/reset-password", authController.ResetPassword)
 
-	protected := apiGroup.Group("/api/v1")
+	protected := apiGroup.Group("/")
 	protected.Use(middleware.AuthMiddleware(blacklistRepo))
 	protected.POST("/auth/logout", authController.Logout)
 	protected.GET("/auth/me", authController.GetProfile)

@@ -1,4 +1,4 @@
-basePath: /03622bf7-d58b-4997-965c-14ee58c63554/api/v1
+basePath: /03622bf7-d58b-4997-965c-14ee58c63554/
 definitions:
   dto.ForgotPasswordRequest:
     properties:

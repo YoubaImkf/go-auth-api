@@ -9,7 +9,7 @@ import (
 // @version         1.0
 // @description     A JWT Authentication Service API
 // @host            localhost:8080
-// @BasePath        /03622bf7-d58b-4997-965c-14ee58c63554/api/v1
+// @BasePath        /03622bf7-d58b-4997-965c-14ee58c63554/
 // @securityDefinitions.apikey Bearer
 // @in header
 // @name Authorization
