@@ -37,8 +37,11 @@ func New() *App {
 }
 
 func (a *App) loadEnv() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+	if os.Getenv("APP_ENVIRONMENT") != "production" {
+		// In development, load environment variables from .env
+		if err := godotenv.Load(); err != nil {
+			log.Printf("Error loading .env file: %v", err)
+		}
 	}
 }
 
