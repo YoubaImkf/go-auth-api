@@ -45,7 +45,7 @@ JWT_SECRET={secret}
 
 ### Configuration
 
-Edit `configs/config.yaml` to configure database and SMTP settings.
+Edit `configs/config.yaml` to configure jwt and group settings.
 
 ### Running the Application
 
@@ -65,13 +65,19 @@ To run the application locally without Docker:
 
 1. Ensure you updated the **docker-compose.yml** and **config.yml** files as comments suggest it !
 
-2. Ensure PostgreSQL and MailDev are running:
+2. Generate the swagger documentation :
+
+    ```sh
+    swag inti -g cmd/api/main.go
+    ```
+
+3. Ensure PostgreSQL and MailDev are running:
 
     ```sh
     docker-compose up db smtp -d
     ```
 
-3. Run the application:
+4. Run the application:
 
     ```sh
     go run cmd/api/main.go
