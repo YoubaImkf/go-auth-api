@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/YoubaImkf/go-auth-api/docs"
 	"github.com/YoubaImkf/go-auth-api/internal/controller"
 	"github.com/YoubaImkf/go-auth-api/internal/middleware"
 	"github.com/YoubaImkf/go-auth-api/internal/model"
@@ -32,6 +33,7 @@ func New() *App {
 	app.loadEnv()
 	app.loadConfig()
 	app.initDB()
+	app.InitSwaggerHost()
 	app.setupRoutes()
 	return app
 }
@@ -55,37 +57,15 @@ func (a *App) loadConfig() {
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file, %s", err)
 	}
-
-	// Bind specific environment variables to override config values
-	if err := viper.BindEnv("database.host", "DATABASE_HOST"); err != nil {
-		log.Printf("Error binding DATABASE_HOST: %v", err)
-	}
-	if err := viper.BindEnv("database.port", "DATABASE_PORT"); err != nil {
-		log.Printf("Error binding DATABASE_PORT: %v", err)
-	}
-
-	if err := viper.BindEnv("smtp.host", "SMTP_HOST"); err != nil {
-		log.Printf("Error binding SMTP_HOST: %v", err)
-	}
-	if err := viper.BindEnv("smtp.port", "SMTP_PORT"); err != nil {
-		log.Printf("Error binding SMTP_PORT: %v", err)
-	}
-	if err := viper.BindEnv("smtp.username", "SMTP_USERNAME"); err != nil {
-		log.Printf("Error binding SMTP_USERNAME: %v", err)
-	}
-	if err := viper.BindEnv("smtp.password", "SMTP_PASSWORD"); err != nil {
-		log.Printf("Error binding SMTP_PASSWORD: %v", err)
-	}
-
 }
 
 func (a *App) initDB() {
 	config := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
-		viper.GetString("database.host"),
-		viper.GetInt("database.port"),
-		os.Getenv("DATABASE_USER"),
-		os.Getenv("DATABASE_NAME"),
-		os.Getenv("DATABASE_PASSWORD"),
+		viper.GetString("DATABASE_HOST"),
+		viper.GetInt("DATABASE_PORT"),
+		viper.GetString("DATABASE_USER"),
+		viper.GetString("DATABASE_NAME"),
+		viper.GetString("DATABASE_PASSWORD"),
 	)
 
 	db, err := gorm.Open("postgres", config)
@@ -97,6 +77,12 @@ func (a *App) initDB() {
 	// Auto Migrate the User model an PasswordReset to create the tables
 	if err := a.db.AutoMigrate(&model.User{}, &model.PasswordReset{}).Error; err != nil {
 		log.Fatalf("Failed to auto-migrate models: %s", err)
+	}
+}
+
+func (a *App) InitSwaggerHost() {
+	if host := os.Getenv("APP_HOST"); host != "" {
+		docs.SwaggerInfo.Host = host
 	}
 }
 
