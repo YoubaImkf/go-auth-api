@@ -23,19 +23,21 @@ Create a `.env` file with the following content:
 
 ```env
 APP_ENVIRONMENT=development
+APP_HOST=localhost:8080
 
 # Database configuration for PostgreSQL
-DATABASE_HOST=localhost
+DATABASE_HOST=db # 'db' with docker-compose, 'localhost' if in local
 DATABASE_PORT=5432
 DATABASE_USER=root
 DATABASE_PASSWORD=root
 DATABASE_NAME=go-auth-db
 
 # SMTP configuration
-SMTP_HOST=localhost
+SMTP_HOST=smtp # 'smtp' with docker-compose, 'localhost' if in local
 SMTP_PORT=1025
 SMTP_USERNAME=
 SMTP_PASSWORD=
+SMTP_FROM=no-reply@example.com
 
 # JWT secret
 JWT_SECRET={secret}
