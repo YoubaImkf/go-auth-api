@@ -2,12 +2,16 @@ FROM golang:1.24-alpine
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+# Installe swag
+RUN go install github.com/swaggo/swag/cmd/swag@latest
 
-# Download the Go module dependencies
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
+
+# Générer la documentation Swagger
+RUN swag init -g cmd/api/main.go
 
 RUN go build -o main cmd/api/main.go
 
