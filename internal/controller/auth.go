@@ -150,7 +150,7 @@ func (c *AuthController) GetProfile(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        email  body  dto.ForgotPasswordRequest  true  "Email"
-// @Success      204  {object}  map[string]interface{}
+// @Success      200  {object}  map[string]interface{}
 // @Router       /forgot-password [post]
 func (c *AuthController) ForgotPassword(ctx *gin.Context) {
 	var forgotPasswordRequest dto.ForgotPasswordRequest
@@ -166,7 +166,7 @@ func (c *AuthController) ForgotPassword(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusNoContent, gin.H{"message": "Password reset link sent", "token": token})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Password reset link sent", "token": token})
 }
 
 // @Summary      Reset password
