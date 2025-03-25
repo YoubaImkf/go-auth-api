@@ -16,6 +16,7 @@ type UserRepository interface {
 	FindEmailByResetToken(token string) (string, error)
 	UpdatePassword(email, newPassword string) error
 	GetAll() ([]model.User, error)
+	RemoveAll() error
 }
 
 type PostgresUserRepository struct {
@@ -78,4 +79,11 @@ func (r *PostgresUserRepository) GetAll() ([]model.User, error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+func (r *PostgresUserRepository) RemoveAll() error {
+	if err := r.db.Delete(&model.User{}).Error; err != nil {
+		return err
+	}
+	return nil
 }

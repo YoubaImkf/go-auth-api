@@ -190,6 +190,23 @@ const docTemplate = `{
                 }
             }
         },
+        "/remove-users": {
+            "delete": {
+                "description": "Remove all users from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Remove all users",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/reset-password": {
             "post": {
                 "description": "Reset the user's password",
@@ -264,11 +281,11 @@ const docTemplate = `{
         "dto.LoginRequest": {
             "type": "object",
             "required": [
-                "identifier",
+                "email",
                 "password"
             ],
             "properties": {
-                "identifier": {
+                "email": {
                     "type": "string"
                 },
                 "password": {
@@ -293,32 +310,20 @@ const docTemplate = `{
         "dto.RegisterRequest": {
             "type": "object",
             "required": [
-                "confirm_password",
                 "email",
-                "first_name",
-                "last_name",
-                "password",
-                "user_name"
+                "name",
+                "password"
             ],
             "properties": {
-                "confirm_password": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
                 },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
+                "name": {
                     "type": "string"
                 },
                 "password": {
                     "type": "string",
                     "minLength": 8
-                },
-                "user_name": {
-                    "type": "string"
                 }
             }
         },
@@ -339,14 +344,10 @@ const docTemplate = `{
         "dto.ResetPasswordRequest": {
             "type": "object",
             "required": [
-                "confirm_password",
                 "new_password",
                 "token"
             ],
             "properties": {
-                "confirm_password": {
-                    "type": "string"
-                },
                 "new_password": {
                     "type": "string",
                     "minLength": 8
@@ -358,21 +359,11 @@ const docTemplate = `{
         },
         "dto.UserResponse": {
             "type": "object",
-            "required": [
-                "first_name",
-                "last_name"
-            ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
-                "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "user_name": {
+                "name": {
                     "type": "string"
                 }
             }
@@ -383,16 +374,10 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "first_name": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "integer"
                 },
-                "last_name": {
-                    "type": "string"
-                },
-                "user_name": {
+                "name": {
                     "type": "string"
                 }
             }

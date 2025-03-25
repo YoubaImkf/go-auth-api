@@ -32,21 +32,15 @@ func NewAuthService(userRepo repository.UserRepository, blacklistRepo repository
 }
 
 func (s *AuthService) Register(registerRequest dto.RegisterRequest) (*model.User, string, string, error) {
-	if registerRequest.Password != registerRequest.ConfirmPassword {
-		return nil, "", "", errors.New("password and confirm pasword do not match")
-	}
-
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(registerRequest.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, "", "", err
 	}
 
 	user := &model.User{
-		FirstName: registerRequest.FirstName,
-		LastName:  registerRequest.LastName,
-		UserName:  registerRequest.UserName,
-		Email:     registerRequest.Email,
-		Password:  string(hashedPassword),
+		Name:     registerRequest.Name,
+		Email:    registerRequest.Email,
+		Password: string(hashedPassword),
 	}
 
 	if err := s.userRepository.Create(user); err != nil {
@@ -62,7 +56,7 @@ func (s *AuthService) Register(registerRequest dto.RegisterRequest) (*model.User
 }
 
 func (s *AuthService) Login(loginRequest dto.LoginRequest) (*model.User, string, string, error) {
-	user, err := s.userRepository.FindByUserNameOrEmail(loginRequest.Identifier)
+	user, err := s.userRepository.FindByEmail(loginRequest.Email)
 	if err != nil {
 		return nil, "", "", err
 	}
@@ -135,10 +129,6 @@ func (s *AuthService) ForgotPassword(email string) error {
 }
 
 func (s *AuthService) ResetPassword(resetPasswordRequest dto.ResetPasswordRequest) error {
-	if resetPasswordRequest.NewPassword != resetPasswordRequest.ConfirmPassword {
-		return errors.New("password and confirm password do not match")
-	}
-
 	email, err := s.userRepository.FindEmailByResetToken(resetPasswordRequest.Token)
 	if err != nil {
 		return errors.New("invalid or expired reset token")

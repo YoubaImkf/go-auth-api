@@ -1,12 +1,9 @@
 package dto
 
 type RegisterRequest struct {
-	FirstName       string `json:"first_name" binding:"required"`
-	LastName        string `json:"last_name" binding:"required"`
-	UserName        string `json:"user_name" binding:"required"`
-	Email           string `json:"email" binding:"required,email"`
-	Password        string `json:"password" binding:"required,min=8"`
-	ConfirmPassword string `json:"confirm_password" binding:"required,eqfield=Password"`
+	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=8"`
 }
 
 type RegisterResponse struct {
@@ -16,8 +13,8 @@ type RegisterResponse struct {
 }
 
 type LoginRequest struct {
-	Identifier string `json:"identifier" binding:"required"`
-	Password   string `json:"password" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type LoginResponse struct {
@@ -27,10 +24,8 @@ type LoginResponse struct {
 }
 
 type UserResponse struct {
-	FirstName string `json:"first_name" binding:"required"`
-	LastName  string `json:"last_name" binding:"required"`
-	UserName  string `json:"user_name"`
-	Email     string `json:"email"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 }
 
 type ForgotPasswordRequest struct {
@@ -38,7 +33,6 @@ type ForgotPasswordRequest struct {
 }
 
 type ResetPasswordRequest struct {
-	Token           string `json:"token" binding:"required"`
-	NewPassword     string `json:"new_password" binding:"required,min=8"`
-	ConfirmPassword string `json:"confirm_password" binding:"required,eqfield=NewPassword"`
+	Token       string `json:"token" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required,min=8"`
 }

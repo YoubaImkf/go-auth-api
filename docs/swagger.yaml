@@ -9,12 +9,12 @@ definitions:
     type: object
   dto.LoginRequest:
     properties:
-      identifier:
+      email:
         type: string
       password:
         type: string
     required:
-    - identifier
+    - email
     - password
     type: object
   dto.LoginResponse:
@@ -28,26 +28,17 @@ definitions:
     type: object
   dto.RegisterRequest:
     properties:
-      confirm_password:
-        type: string
       email:
         type: string
-      first_name:
-        type: string
-      last_name:
+      name:
         type: string
       password:
         minLength: 8
         type: string
-      user_name:
-        type: string
     required:
-    - confirm_password
     - email
-    - first_name
-    - last_name
+    - name
     - password
-    - user_name
     type: object
   dto.RegisterResponse:
     properties:
@@ -60,15 +51,12 @@ definitions:
     type: object
   dto.ResetPasswordRequest:
     properties:
-      confirm_password:
-        type: string
       new_password:
         minLength: 8
         type: string
       token:
         type: string
     required:
-    - confirm_password
     - new_password
     - token
     type: object
@@ -76,27 +64,16 @@ definitions:
     properties:
       email:
         type: string
-      first_name:
+      name:
         type: string
-      last_name:
-        type: string
-      user_name:
-        type: string
-    required:
-    - first_name
-    - last_name
     type: object
   model.User:
     properties:
       email:
         type: string
-      first_name:
-        type: string
       id:
         type: integer
-      last_name:
-        type: string
-      user_name:
+      name:
         type: string
     type: object
 host: localhost:8080
@@ -218,6 +195,17 @@ paths:
       summary: Register user
       tags:
       - auth
+  /remove-users:
+    delete:
+      description: Remove all users from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Remove all users
+      tags:
+      - user
   /reset-password:
     post:
       consumes:

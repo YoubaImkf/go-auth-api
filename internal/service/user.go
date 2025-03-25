@@ -1,24 +1,29 @@
 package service
 
 import (
-    "github.com/YoubaImkf/go-auth-api/internal/model"
-    "github.com/YoubaImkf/go-auth-api/internal/repository"
+	"github.com/YoubaImkf/go-auth-api/internal/model"
+	"github.com/YoubaImkf/go-auth-api/internal/repository"
 )
 
 type UserService interface {
-    GetAllUsers() ([]model.User, error)
+	GetAllUsers() ([]model.User, error)
+	RemoveAllUsers() error
 }
 
 type userService struct {
-    userRepository repository.UserRepository
+	userRepository repository.UserRepository
 }
 
 func NewUserService(userRepo repository.UserRepository) UserService {
-    return &userService{
-        userRepository: userRepo,
-    }
+	return &userService{
+		userRepository: userRepo,
+	}
 }
 
 func (s *userService) GetAllUsers() ([]model.User, error) {
-    return s.userRepository.GetAll()
+	return s.userRepository.GetAll()
+}
+
+func (s *userService) RemoveAllUsers() error {
+	return s.userRepository.RemoveAll()
 }

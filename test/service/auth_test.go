@@ -16,6 +16,11 @@ type MockUserRepository struct {
 	mock.Mock
 }
 
+// RRemoveAll implements repository.UserRepository.
+func (m *MockUserRepository) RemoveAll() error {
+	panic("unimplemented")
+}
+
 func (m *MockUserRepository) Create(user *model.User) error {
 	args := m.Called(user)
 	return args.Error(0)
@@ -82,12 +87,9 @@ func TestAuthService_Register(t *testing.T) {
 	authService := service.NewAuthService(mockUserRepo, mockBlacklistRepo, mockEmailService)
 
 	registerRequest := dto.RegisterRequest{
-		FirstName:       "John",
-		LastName:        "Doe",
-		UserName:        "johndoe",
-		Email:           "john.doe@example.com",
-		Password:        "password123",
-		ConfirmPassword: "password123",
+		Name:     "johndoe",
+		Email:    "john.doe@example.com",
+		Password: "password123",
 	}
 
 	mockUserRepo.On("Create", mock.Anything).Return(nil)
@@ -108,20 +110,18 @@ func TestAuthService_Login(t *testing.T) {
 	authService := service.NewAuthService(mockUserRepo, mockBlacklistRepo, mockEmailService)
 
 	loginRequest := dto.LoginRequest{
-		Identifier: "johndoe",
-		Password:   "password123",
+		Email:    "johndoe",
+		Password: "password123",
 	}
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
 	mockUser := &model.User{
-		FirstName: "John",
-		LastName:  "Doe",
-		UserName:  "johndoe",
-		Email:     "john.doe@example.com",
-		Password:  string(hashedPassword),
+		Name:     "johndoe",
+		Email:    "john.doe@example.com",
+		Password: string(hashedPassword),
 	}
 
-	mockUserRepo.On("FindByUserNameOrEmail", "johndoe").Return(mockUser, nil)
+	mockUserRepo.On("FindByEmail", "john.doe@example.com").Return(mockUser, nil)
 
 	user, accessToken, refreshToken, err := authService.Login(loginRequest)
 
@@ -160,10 +160,8 @@ func TestAuthService_ForgotPassword(t *testing.T) {
 
 	email := "john.doe@example.com"
 	mockUser := &model.User{
-		FirstName: "John",
-		LastName:  "Doe",
-		UserName:  "johndoe",
-		Email:     email,
+		Name:  "johndoe",
+		Email: email,
 	}
 
 	mockUserRepo.On("FindByEmail", email).Return(mockUser, nil)
@@ -184,9 +182,8 @@ func TestAuthService_ResetPassword(t *testing.T) {
 	authService := service.NewAuthService(mockUserRepo, mockBlacklistRepo, mockEmailService)
 
 	resetPasswordRequest := dto.ResetPasswordRequest{
-		Token:           "reset_token",
-		NewPassword:     "newpassword123",
-		ConfirmPassword: "newpassword123",
+		Token:       "reset_token",
+		NewPassword: "newpassword123",
 	}
 
 	email := "john.doe@example.com"
@@ -206,16 +203,12 @@ func TestUserService_GetAllUsers(t *testing.T) {
 
 	mockUsers := []model.User{
 		{
-			FirstName: "John",
-			LastName:  "Doe",
-			UserName:  "johndoe",
-			Email:     "john.doe@example.com",
+			Name:  "johndoe",
+			Email: "john.doe@example.com",
 		},
 		{
-			FirstName: "Jane",
-			LastName:  "Doe",
-			UserName:  "janedoe",
-			Email:     "jane.doe@example.com",
+			Name:  "johndoe",
+			Email: "jane.doe@example.com",
 		},
 	}
 

@@ -106,6 +106,7 @@ func (a *App) setupRoutes() {
 
 	apiGroup.GET("/health", healthController.Health)
 	apiGroup.GET("/users", userController.GetAllUsers)
+	apiGroup.DELETE("/remove-users", userController.RemoveAllUsers)
 
 	apiGroup.POST("/register", authController.Register)
 	apiGroup.POST("/login", authController.Login)

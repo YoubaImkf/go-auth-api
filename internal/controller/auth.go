@@ -43,10 +43,8 @@ func (c *AuthController) Register(ctx *gin.Context) {
 
 	response := dto.RegisterResponse{
 		User: dto.UserResponse{
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
-			UserName:  user.UserName,
-			Email:     user.Email,
+			Name:  user.Name,
+			Email: user.Email,
 		},
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
@@ -79,10 +77,8 @@ func (c *AuthController) Login(ctx *gin.Context) {
 
 	response := dto.LoginResponse{
 		User: dto.UserResponse{
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
-			UserName:  user.UserName,
-			Email:     user.Email,
+			Name:  user.Name,
+			Email: user.Email,
 		},
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
@@ -141,10 +137,8 @@ func (c *AuthController) GetProfile(ctx *gin.Context) {
 	}
 
 	response := dto.UserResponse{
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		UserName:  user.UserName,
-		Email:     user.Email,
+		Name:  user.Name,
+		Email: user.Email,
 	}
 
 	ctx.JSON(http.StatusOK, response)

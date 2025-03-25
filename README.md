@@ -70,6 +70,10 @@ To run the application locally without Docker:
     ```sh
     swag inti -g cmd/api/main.go
     ```
+    or 
+    ```sh
+    swag init -d ./cmd/api/ --pdl 3
+    ```
 
 3. Ensure PostgreSQL and MailDev are running:
 
@@ -91,12 +95,12 @@ Access the Swagger UI at `http://localhost:8080/swagger/index.html`.
 
 ### Auth
 
-- `POST /{UUID}/auth/register` - Register a new user
-- `POST /{UUID}/auth/login` - Authenticate a user
-- `POST /{UUID}/auth/forgot-password` - Request a password reset
-- `POST /{UUID}/auth/reset-password` - Reset the user's password
-- `POST /{UUID}/auth/logout` - Logout a user (protected)
-- `GET /{UUID}/auth/me` - Get user profile (protected)
+- `POST /{UUID}/register` - Register a new user
+- `POST /{UUID}/login` - Authenticate a user
+- `POST /{UUID}/forgot-password` - Request a password reset
+- `POST /{UUID}/reset-password` - Reset the user's password
+- `POST /{UUID}/logout` - Logout a user (protected)
+- `GET /{UUID}/me` - Get user profile (protected)
 
 ### Health
 
@@ -105,6 +109,7 @@ Access the Swagger UI at `http://localhost:8080/swagger/index.html`.
 ### USer
 
 - `GET /{UUID}/users` - Check the health of the service
+- `DELETE /{UUID}/remove-users` - Check the health of the service
 
 
 ## 🧪 Running Tests

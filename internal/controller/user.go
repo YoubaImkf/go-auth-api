@@ -31,3 +31,18 @@ func (c *UserController) GetAllUsers(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, users)
 }
+
+// @Summary      Remove all users
+// @Description  Remove all users from the database
+// @Tags         user
+// @Produce      json
+// @Success      200
+// @Router       /remove-users [delete]
+func (c *UserController) RemoveAllUsers(ctx *gin.Context) {
+	err := c.userService.RemoveAllUsers()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.Status(http.StatusOK)
+}
