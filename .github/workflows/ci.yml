@@ -16,9 +16,9 @@ jobs:
       postgres:
         image: postgres:alpine
         env:
-          DATABASE_USER: ${{ secrets.DATABASE_USER }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+          POSTGRES_USER: ${{ secrets.DATABASE_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DATABASE_NAME }}
         ports:
           - 5432:5432
         options: >-
@@ -53,9 +53,9 @@ jobs:
         env:
           DATABASE_HOST: postgres
           DATABASE_PORT: 5432
-          DATABASE_USER: ${{ secrets.DATABASE_USER }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          DATABASE_NAME: go-auth-db-test
+          POSTGRES_USER: ${{ secrets.DATABASE_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          POSTGRES_DB: go-auth-db-test
           SMTP_HOST: smtp
           SMTP_PORT: 1025
         run: go test ./test/...
