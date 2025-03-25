@@ -17,7 +17,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+      - ./sql-scripts/create-db.sql:/docker-entrypoint-initdb.d/create_database.sql
+   
   # Comment 'app' section if you want to run API on your local
   app:
     build: .

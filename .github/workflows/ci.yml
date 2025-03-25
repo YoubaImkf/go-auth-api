@@ -16,13 +16,13 @@ jobs:
       postgres:
         image: postgres:alpine
         env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          DATABASE_USER: ${{ secrets.DATABASE_USER }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U root"
+          --health-cmd="pg_isready -U ${{ secrets.DATABASE_USER }}"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -45,14 +45,20 @@ jobs:
       - name: Install dependencies
         run: go mod download
 
+      - name: Create test database
+        run: |
+          psql -h postgres -U ${{ secrets.DATABASE_USER }} -c "CREATE DATABASE go-auth-db-test;"
+
       - name: Run tests
         env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          DATABASE_HOST: postgres
+          DATABASE_PORT: 5432
+          DATABASE_USER: ${{ secrets.DATABASE_USER }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_NAME: go-auth-db-test
           SMTP_HOST: smtp
           SMTP_PORT: 1025
-        run: go test ./...
+        run: go test ./test/...
 
       - name: Build Docker image 🐳
         run: docker build -t go-auth-api .

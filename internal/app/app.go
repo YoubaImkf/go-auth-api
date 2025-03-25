@@ -63,9 +63,9 @@ func (a *App) initDB() {
 	config := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
 		viper.GetString("DATABASE_HOST"),
 		viper.GetInt("DATABASE_PORT"),
-		viper.GetString("DATABASE_USER"),
-		viper.GetString("DATABASE_NAME"),
-		viper.GetString("DATABASE_PASSWORD"),
+		viper.GetString("POSTGRES_USER"),
+		viper.GetString("POSTGRES_DB"),
+		viper.GetString("POSTGRES_PASSWORD"),
 	)
 
 	db, err := gorm.Open("postgres", config)

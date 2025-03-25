@@ -1,69 +1,23 @@
 package service
 
 import (
+	"fmt"
+	"os"
 	"testing"
 	"time"
 
 	"github.com/YoubaImkf/go-auth-api/internal/dto"
 	"github.com/YoubaImkf/go-auth-api/internal/model"
+	"github.com/YoubaImkf/go-auth-api/internal/repository"
 	"github.com/YoubaImkf/go-auth-api/internal/service"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
 	"golang.org/x/crypto/bcrypt"
 )
-
-type MockUserRepository struct {
-	mock.Mock
-}
-
-// RRemoveAll implements repository.UserRepository.
-func (m *MockUserRepository) RemoveAll() error {
-	panic("unimplemented")
-}
-
-func (m *MockUserRepository) Create(user *model.User) error {
-	args := m.Called(user)
-	return args.Error(0)
-}
-
-func (m *MockUserRepository) FindByEmail(email string) (*model.User, error) {
-	args := m.Called(email)
-	return args.Get(0).(*model.User), args.Error(1)
-}
-
-func (m *MockUserRepository) FindByUserNameOrEmail(identifier string) (*model.User, error) {
-	args := m.Called(identifier)
-	return args.Get(0).(*model.User), args.Error(1)
-}
-
-func (m *MockUserRepository) StorePasswordResetToken(email, token string, expiry time.Time) error {
-	args := m.Called(email, token, expiry)
-	return args.Error(0)
-}
-
-func (m *MockUserRepository) FindEmailByResetToken(token string) (string, error) {
-	args := m.Called(token)
-	return args.String(0), args.Error(1)
-}
-
-func (m *MockUserRepository) UpdatePassword(email, newPassword string) error {
-	args := m.Called(email, newPassword)
-	return args.Error(0)
-}
-
-type MockBlacklistRepository struct {
-	mock.Mock
-}
-
-func (m *MockBlacklistRepository) Add(token string, expiry time.Time) error {
-	args := m.Called(token, expiry)
-	return args.Error(0)
-}
-
-func (m *MockBlacklistRepository) IsBlacklisted(token string) bool {
-	args := m.Called(token)
-	return args.Bool(0)
-}
 
 type MockEmailService struct {
 	mock.Mock
@@ -74,149 +28,149 @@ func (m *MockEmailService) SendPasswordResetEmail(to, token string) error {
 	return args.Error(0)
 }
 
-// User service
-func (m *MockUserRepository) GetAll() ([]model.User, error) {
-	args := m.Called()
-	return args.Get(0).([]model.User), args.Error(1)
+type AuthServiceTestSuite struct {
+	suite.Suite
+	db            *gorm.DB
+	userRepo      repository.UserRepository
+	blacklistRepo repository.BlacklistRepository
+	emailService  *MockEmailService
+	authService   *service.AuthService
 }
 
-func TestAuthService_Register(t *testing.T) {
-	mockUserRepo := new(MockUserRepository)
-	mockBlacklistRepo := new(MockBlacklistRepository)
-	mockEmailService := new(MockEmailService)
-	authService := service.NewAuthService(mockUserRepo, mockBlacklistRepo, mockEmailService)
+func (suite *AuthServiceTestSuite) SetupSuite() {
+	err := godotenv.Load("../../.env")
+	if err != nil {
+		suite.T().Fatal("Error loading .env file")
+	}
 
+	dbHost := os.Getenv("DATABASE_HOST")
+	if dbHost == "db" {
+		dbHost = "localhost" // Use localhost for local testing
+	}
+
+	dbPort := os.Getenv("DATABASE_PORT")
+	dbUser := os.Getenv("POSTGRES_USER")
+	dbPassword := os.Getenv("POSTGRES_PASSWORD")
+	testDbName := "go-auth-db-test"
+
+	db, err := gorm.Open("postgres", fmt.Sprintf(
+		"host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+		dbHost, dbPort, dbUser, testDbName, dbPassword))
+	if err != nil {
+		suite.T().Fatal(err)
+	}
+
+	suite.db = db
+
+	suite.db.AutoMigrate(&model.User{}, &model.PasswordReset{})
+
+	suite.userRepo = repository.NewPostgresUserRepository(suite.db)
+	suite.blacklistRepo = repository.NewPostgresBlacklistRepository(suite.db)
+	suite.emailService = new(MockEmailService)
+	suite.authService = service.NewAuthService(suite.userRepo, suite.blacklistRepo, suite.emailService)
+}
+
+func (suite *AuthServiceTestSuite) TearDownSuite() {
+	suite.db.Close()
+}
+
+func (suite *AuthServiceTestSuite) SetupTest() {
+	// Clean up the database before each test
+	suite.db.Exec("DELETE FROM users")
+	suite.db.Exec("DELETE FROM password_resets")
+}
+
+func (suite *AuthServiceTestSuite) TestRegister() {
 	registerRequest := dto.RegisterRequest{
 		Name:     "johndoe",
 		Email:    "john.doe@example.com",
-		Password: "password123",
+		Password: "Password123!",
 	}
 
-	mockUserRepo.On("Create", mock.Anything).Return(nil)
+	user, accessToken, refreshToken, err := suite.authService.Register(registerRequest)
 
-	user, accessToken, refreshToken, err := authService.Register(registerRequest)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, user)
-	assert.NotEmpty(t, accessToken)
-	assert.NotEmpty(t, refreshToken)
-	mockUserRepo.AssertExpectations(t)
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), user)
+	assert.NotEmpty(suite.T(), accessToken)
+	assert.NotEmpty(suite.T(), refreshToken)
 }
 
-func TestAuthService_Login(t *testing.T) {
-	mockUserRepo := new(MockUserRepository)
-	mockBlacklistRepo := new(MockBlacklistRepository)
-	mockEmailService := new(MockEmailService)
-	authService := service.NewAuthService(mockUserRepo, mockBlacklistRepo, mockEmailService)
-
-	loginRequest := dto.LoginRequest{
-		Email:    "john.doe@example.com",
-		Password: "password123",
-	}
-
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password123"), bcrypt.DefaultCost)
-	mockUser := &model.User{
+func (suite *AuthServiceTestSuite) TestLogin() {
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("Password123!"), bcrypt.DefaultCost)
+	user := &model.User{
 		Name:     "johndoe",
 		Email:    "john.doe@example.com",
 		Password: string(hashedPassword),
 	}
+	suite.userRepo.Create(user)
 
-	mockUserRepo.On("FindByEmail", "john.doe@example.com").Return(mockUser, nil)
-
-	user, accessToken, refreshToken, err := authService.Login(loginRequest)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, user)
-	assert.NotEmpty(t, accessToken)
-	assert.NotEmpty(t, refreshToken)
-	mockUserRepo.AssertExpectations(t)
-}
-
-// func TestAuthService_Logout(t *testing.T) {
-//     mockUserRepo := new(MockUserRepository)
-//     mockBlacklistRepo := new(MockBlacklistRepository)
-//     mockEmailService := new(MockEmailService)
-//     authService := service.NewAuthService(mockUserRepo, mockBlacklistRepo, mockEmailService)
-
-//     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-//         "sub": "john.doe@example.com",
-//         "exp": time.Now().Add(time.Hour).Unix(),
-//     })
-//     tokenString, _ := token.SignedString([]byte("your_jwt_secret"))
-
-//     mockBlacklistRepo.On("Add", tokenString, mock.Anything).Return(nil)
-
-//     err := authService.Logout(tokenString)
-
-//     assert.NoError(t, err)
-//     mockBlacklistRepo.AssertExpectations(t)
-// }
-
-func TestAuthService_ForgotPassword(t *testing.T) {
-	mockUserRepo := new(MockUserRepository)
-	mockBlacklistRepo := new(MockBlacklistRepository)
-	mockEmailService := new(MockEmailService)
-	authService := service.NewAuthService(mockUserRepo, mockBlacklistRepo, mockEmailService)
-
-	email := "john.doe@example.com"
-	mockUser := &model.User{
-		Name:  "johndoe",
-		Email: email,
+	loginRequest := dto.LoginRequest{
+		Email:    "john.doe@example.com",
+		Password: "Password123!",
 	}
 
-	mockUserRepo.On("FindByEmail", email).Return(mockUser, nil)
-	mockUserRepo.On("StorePasswordResetToken", email, mock.Anything, mock.Anything).Return(nil)
-	mockEmailService.On("SendPasswordResetEmail", email, mock.Anything).Return(nil)
+	user, accessToken, refreshToken, err := suite.authService.Login(loginRequest)
 
-	err := authService.ForgotPassword(email)
-
-	assert.NoError(t, err)
-	mockUserRepo.AssertExpectations(t)
-	mockEmailService.AssertExpectations(t)
+	assert.NoError(suite.T(), err)
+	assert.NotNil(suite.T(), user)
+	assert.NotEmpty(suite.T(), accessToken)
+	assert.NotEmpty(suite.T(), refreshToken)
 }
 
-func TestAuthService_ResetPassword(t *testing.T) {
-	mockUserRepo := new(MockUserRepository)
-	mockBlacklistRepo := new(MockBlacklistRepository)
-	mockEmailService := new(MockEmailService)
-	authService := service.NewAuthService(mockUserRepo, mockBlacklistRepo, mockEmailService)
+func (suite *AuthServiceTestSuite) TestForgotPassword() {
+	user := &model.User{
+		Name:  "johndoe",
+		Email: "john.doe@example.com",
+	}
+	suite.userRepo.Create(user)
+
+	suite.emailService.On("SendPasswordResetEmail", "john.doe@example.com", mock.Anything).Return(nil)
+
+	err := suite.authService.ForgotPassword("john.doe@example.com")
+
+	assert.NoError(suite.T(), err)
+	suite.emailService.AssertExpectations(suite.T())
+}
+
+func (suite *AuthServiceTestSuite) TestResetPassword() {
+	user := &model.User{
+		Name:  "johndoe",
+		Email: "john.doe@example.com",
+	}
+	suite.userRepo.Create(user)
+
+	token := "reset_token"
+	expiry := time.Now().Add(1 * time.Hour)
+	suite.userRepo.StorePasswordResetToken(user.Email, token, expiry)
 
 	resetPasswordRequest := dto.ResetPasswordRequest{
-		Token:       "reset_token",
-		NewPassword: "newpassword123",
+		Token:       token,
+		NewPassword: "newPassword123!",
 	}
 
-	email := "john.doe@example.com"
-	mockUserRepo.On("FindEmailByResetToken", "reset_token").Return(email, nil)
-	mockUserRepo.On("UpdatePassword", email, mock.Anything).Return(nil)
+	err := suite.authService.ResetPassword(resetPasswordRequest)
 
-	err := authService.ResetPassword(resetPasswordRequest)
-
-	assert.NoError(t, err)
-	mockUserRepo.AssertExpectations(t)
+	assert.NoError(suite.T(), err)
 }
 
-// User service
-func TestUserService_GetAllUsers(t *testing.T) {
-	mockUserRepo := new(MockUserRepository)
-	userService := service.NewUserService(mockUserRepo)
-
-	mockUsers := []model.User{
-		{
-			Name:  "johndoe",
-			Email: "john.doe@example.com",
-		},
-		{
-			Name:  "johndoe",
-			Email: "jane.doe@example.com",
-		},
+func (suite *AuthServiceTestSuite) TestGetAllUsers() {
+	user1 := &model.User{
+		Name:  "johndoe",
+		Email: "john.doe@example.com",
 	}
+	user2 := &model.User{
+		Name:  "janedoe",
+		Email: "jane.doe@example.com",
+	}
+	suite.userRepo.Create(user1)
+	suite.userRepo.Create(user2)
 
-	mockUserRepo.On("GetAll").Return(mockUsers, nil)
+	users, err := suite.userRepo.GetAll()
 
-	users, err := userService.GetAllUsers()
+	assert.NoError(suite.T(), err)
+	assert.Len(suite.T(), users, 2)
+}
 
-	assert.NoError(t, err)
-	assert.Equal(t, mockUsers, users)
-	mockUserRepo.AssertExpectations(t)
+func TestAuthServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(AuthServiceTestSuite))
 }
