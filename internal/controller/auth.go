@@ -113,7 +113,7 @@ func (c *AuthController) Logout(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
+	ctx.JSON(http.StatusNoContent, gin.H{"message": "Successfully logged out"})
 }
 
 // @Summary      Get user profile
@@ -166,7 +166,7 @@ func (c *AuthController) ForgotPassword(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Password reset link sent", "token": token})
+	ctx.JSON(http.StatusNoContent, gin.H{"message": "Password reset link sent", "token": token})
 }
 
 // @Summary      Reset password
