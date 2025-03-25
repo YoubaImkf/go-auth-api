@@ -39,48 +39,10 @@ type AuthServiceTestSuite struct {
 }
 
 func (suite *AuthServiceTestSuite) SetupSuite() {
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		log.Println("Warning: .env file not found, using environment variables")
-	}
-
-	dbHost := os.Getenv("DATABASE_HOST")
-	if dbHost == "" {
-		dbHost = "localhost"
-	}
-
-	dbPort := os.Getenv("DATABASE_PORT")
-	if dbPort == "" {
-		dbPort = "5432"
-	}
-
-	dbUser := os.Getenv("POSTGRES_USER")
-	if dbUser == "" {
-		dbUser = "root"
-	}
-
-	dbPassword := os.Getenv("POSTGRES_PASSWORD")
-	if dbPassword == "" {
-		dbPassword = "lets-jungle-it-bro!"
-	}
-
-	testDbName := "go-auth-db-test"
-
-	db, err := gorm.Open("postgres", fmt.Sprintf(
-		"host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
-		dbHost, dbPort, dbUser, testDbName, dbPassword))
-	if err != nil {
-		suite.T().Fatal(err)
-	}
-
-	suite.db = db
-
-	suite.db.AutoMigrate(&model.User{}, &model.PasswordReset{})
-
-	suite.userRepo = repository.NewPostgresUserRepository(suite.db)
-	suite.blacklistRepo = repository.NewPostgresBlacklistRepository(suite.db)
-	suite.emailService = new(MockEmailService)
-	suite.authService = service.NewAuthService(suite.userRepo, suite.blacklistRepo, suite.emailService)
+	suite.loadEnvironmentVariables()
+	suite.initializeDatabase()
+	suite.initializeRepositories()
+	suite.initializeServices()
 }
 
 func (suite *AuthServiceTestSuite) TearDownSuite() {
@@ -327,4 +289,66 @@ func (suite *AuthServiceTestSuite) TestGetAllUsers() {
 
 func TestAuthServiceTestSuite(t *testing.T) {
 	suite.Run(t, new(AuthServiceTestSuite))
+}
+
+// --- Private Methods ---
+
+func (suite *AuthServiceTestSuite) loadEnvironmentVariables() {
+	if err := godotenv.Load("../../.env"); err != nil {
+		log.Println("Warning: .env file not found, using environment variables")
+	}
+}
+
+func (suite *AuthServiceTestSuite) getDBConfig() (host, port, user, password string) {
+	host = suite.getEnvOrDefault("DATABASE_HOST", "localhost")
+	port = suite.getEnvOrDefault("DATABASE_PORT", "5432")
+	user = suite.getEnvOrDefault("POSTGRES_USER", "root")
+	password = suite.getEnvOrDefault("POSTGRES_PASSWORD", "lets-jungle-it-bro!")
+	return
+}
+
+func (suite *AuthServiceTestSuite) getEnvOrDefault(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+
+func (suite *AuthServiceTestSuite) initializeDatabase() {
+	host, port, user, password := suite.getDBConfig()
+	testDbName := "go-auth-db-test"
+
+	db, err := suite.connectToDatabase(host, port, user, password, testDbName)
+	if err != nil {
+		suite.T().Fatalf("Failed to connect to database: %v", err)
+	}
+
+	suite.db = db
+	suite.migrateDatabase()
+}
+
+func (suite *AuthServiceTestSuite) connectToDatabase(host, port, user, password, dbName string) (*gorm.DB, error) {
+	dsn := fmt.Sprintf(
+		"host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+		host, port, user, dbName, password,
+	)
+	return gorm.Open("postgres", dsn)
+}
+
+func (suite *AuthServiceTestSuite) migrateDatabase() {
+	suite.db.AutoMigrate(&model.User{}, &model.PasswordReset{})
+}
+
+func (suite *AuthServiceTestSuite) initializeRepositories() {
+	suite.userRepo = repository.NewPostgresUserRepository(suite.db)
+	suite.blacklistRepo = repository.NewPostgresBlacklistRepository(suite.db)
+}
+
+func (suite *AuthServiceTestSuite) initializeServices() {
+	suite.emailService = new(MockEmailService)
+	suite.authService = service.NewAuthService(
+		suite.userRepo,
+		suite.blacklistRepo,
+		suite.emailService,
+	)
 }
