@@ -118,6 +118,7 @@ func (suite *AuthServiceTestSuite) TestLogin() {
 }
 
 func (suite *AuthServiceTestSuite) TestForgotPassword() {
+	// Setup
 	user := &model.User{
 		Name:  "johndoe",
 		Email: "john.doe@example.com",
@@ -126,10 +127,27 @@ func (suite *AuthServiceTestSuite) TestForgotPassword() {
 
 	suite.emailService.On("SendPasswordResetEmail", "john.doe@example.com", mock.Anything).Return(nil)
 
-	err := suite.authService.ForgotPassword("john.doe@example.com")
+	token, err := suite.authService.ForgotPassword("john.doe@example.com")
 
 	assert.NoError(suite.T(), err)
+	assert.NotEmpty(suite.T(), token)
+	assert.Len(suite.T(), token, 64)
 	suite.emailService.AssertExpectations(suite.T())
+
+	var passwordReset model.PasswordReset
+	err = suite.db.Where("email = ? AND token = ?", user.Email, token).First(&passwordReset).Error
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), user.Email, passwordReset.Email)
+	assert.Equal(suite.T(), token, passwordReset.Token)
+}
+
+func (suite *AuthServiceTestSuite) TestForgotPasswordUserNotFound() {
+	token, err := suite.authService.ForgotPassword("nonexistent@example.com")
+
+	assert.Error(suite.T(), err)
+	assert.Empty(suite.T(), token)
+	assert.Equal(suite.T(), "user not found", err.Error())
+	suite.emailService.AssertNotCalled(suite.T(), "SendPasswordResetEmail")
 }
 
 func (suite *AuthServiceTestSuite) TestResetPassword() {
