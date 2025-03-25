@@ -26,6 +26,7 @@ func NewAuthController(authService *service.AuthService) *AuthController {
 // @Produce      json
 // @Param        user  body  dto.RegisterRequest  true  "User"
 // @Success      201  {object}  dto.RegisterResponse
+// @Failure      409  {object}  map[string]interface{}  "User already exists"
 // @Router       /register [post]
 func (c *AuthController) Register(ctx *gin.Context) {
 	var registerRequest dto.RegisterRequest
@@ -37,7 +38,11 @@ func (c *AuthController) Register(ctx *gin.Context) {
 
 	user, accessToken, refreshToken, err := c.authService.Register(registerRequest)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if err.Error() == "user already exists" {
+			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 

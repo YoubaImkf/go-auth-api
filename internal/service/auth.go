@@ -32,6 +32,11 @@ func NewAuthService(userRepo repository.UserRepository, blacklistRepo repository
 }
 
 func (s *AuthService) Register(registerRequest dto.RegisterRequest) (*model.User, string, string, error) {
+	existingUser, err := s.userRepository.FindByEmail(registerRequest.Email)
+	if err == nil && existingUser != nil {
+		return nil, "", "", errors.New("user already exists")
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(registerRequest.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, "", "", err
