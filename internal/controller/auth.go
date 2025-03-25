@@ -91,7 +91,7 @@ func (c *AuthController) Login(ctx *gin.Context) {
 // @Description  Logout a user
 // @Tags         auth
 // @Produce      json
-// @Success      200  {object}  map[string]interface{}
+// @Success      204  {object}  map[string]interface{}
 // @Router       /logout [post]
 // @Security     Bearer
 func (c *AuthController) Logout(ctx *gin.Context) {
@@ -120,7 +120,7 @@ func (c *AuthController) Logout(ctx *gin.Context) {
 // @Description  Get the profile of the logged-in user
 // @Tags         auth
 // @Produce      json
-// @Success      204  {object}  dto.UserResponse
+// @Success      200  {object}  dto.UserResponse
 // @Router       /me [get]
 // @Security     Bearer
 func (c *AuthController) GetProfile(ctx *gin.Context) {
@@ -150,7 +150,7 @@ func (c *AuthController) GetProfile(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        email  body  dto.ForgotPasswordRequest  true  "Email"
-// @Success      200  {object}  map[string]interface{}
+// @Success      204  {object}  map[string]interface{}
 // @Router       /forgot-password [post]
 func (c *AuthController) ForgotPassword(ctx *gin.Context) {
 	var forgotPasswordRequest dto.ForgotPasswordRequest
