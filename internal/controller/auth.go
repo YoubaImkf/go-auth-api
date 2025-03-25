@@ -120,7 +120,7 @@ func (c *AuthController) Logout(ctx *gin.Context) {
 // @Description  Get the profile of the logged-in user
 // @Tags         auth
 // @Produce      json
-// @Success      200  {object}  dto.UserResponse
+// @Success      204  {object}  dto.UserResponse
 // @Router       /me [get]
 // @Security     Bearer
 func (c *AuthController) GetProfile(ctx *gin.Context) {
@@ -160,13 +160,13 @@ func (c *AuthController) ForgotPassword(ctx *gin.Context) {
 		return
 	}
 
-	err := c.authService.ForgotPassword(forgotPasswordRequest.Email)
+	token, err := c.authService.ForgotPassword(forgotPasswordRequest.Email)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Password reset link sent"})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Password reset link sent", "token": token})
 }
 
 // @Summary      Reset password

@@ -101,31 +101,31 @@ func (s *AuthService) GetUserProfile(email string) (*model.User, error) {
 	return user, nil
 }
 
-func (s *AuthService) ForgotPassword(email string) error {
+func (s *AuthService) ForgotPassword(email string) (string, error) {
 	user, err := s.userRepository.FindByEmail(email)
 	if err != nil {
-		return errors.New("user not found")
+		return "", errors.New("user not found")
 	}
 
 	token := make([]byte, 32)
 	if _, err := rand.Read(token); err != nil {
-		return err
+		return "", err
 	}
 	resetToken := hex.EncodeToString(token)
 
 	// Store the token :3
 	expiry := time.Now().Add(1 * time.Hour)
 	if err := s.userRepository.StorePasswordResetToken(user.Email, resetToken, expiry); err != nil {
-		return err
+		return "", err
 	}
 	// Send the token via email
 	if err := s.emailService.SendPasswordResetEmail(user.Email, resetToken); err != nil {
-		return err
+		return "", err
 	}
 
 	log.Printf("Password reset token for %s: %s", user.Email, resetToken)
 
-	return nil
+	return resetToken, nil
 }
 
 func (s *AuthService) ResetPassword(resetPasswordRequest dto.ResetPasswordRequest) error {
