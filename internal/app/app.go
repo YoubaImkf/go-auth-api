@@ -107,16 +107,15 @@ func (a *App) setupRoutes() {
 	apiGroup.GET("/health", healthController.Health)
 	apiGroup.GET("/users", userController.GetAllUsers)
 
-	authGroup := apiGroup.Group("/auth")
-	authGroup.POST("/register", authController.Register)
-	authGroup.POST("/login", authController.Login)
-	authGroup.POST("/forgot-password", authController.ForgotPassword)
-	authGroup.POST("/reset-password", authController.ResetPassword)
+	apiGroup.POST("/register", authController.Register)
+	apiGroup.POST("/login", authController.Login)
+	apiGroup.POST("/forgot-password", authController.ForgotPassword)
+	apiGroup.POST("/reset-password", authController.ResetPassword)
 
 	protected := apiGroup.Group("/")
 	protected.Use(middleware.AuthMiddleware(blacklistRepo))
-	protected.POST("/auth/logout", authController.Logout)
-	protected.GET("/auth/me", authController.GetProfile)
+	protected.POST("/logout", authController.Logout)
+	protected.GET("/me", authController.GetProfile)
 }
 
 func (a *App) Run() {

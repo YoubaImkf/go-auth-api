@@ -9,7 +9,7 @@
     "host": "localhost:8080",
     "basePath": "/03622bf7-d58b-4997-965c-14ee58c63554/",
     "paths": {
-        "/auth/forgot-password": {
+        "/forgot-password": {
             "post": {
                 "description": "Request a password reset",
                 "consumes": [
@@ -44,7 +44,28 @@
                 }
             }
         },
-        "/auth/login": {
+        "/health": {
+            "get": {
+                "description": "Check the health of the service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health Check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
             "post": {
                 "description": "Authenticate a user",
                 "consumes": [
@@ -78,7 +99,7 @@
                 }
             }
         },
-        "/auth/logout": {
+        "/logout": {
             "post": {
                 "security": [
                     {
@@ -104,7 +125,7 @@
                 }
             }
         },
-        "/auth/me": {
+        "/me": {
             "get": {
                 "security": [
                     {
@@ -129,7 +150,7 @@
                 }
             }
         },
-        "/auth/register": {
+        "/register": {
             "post": {
                 "description": "Register a new user",
                 "consumes": [
@@ -163,7 +184,7 @@
                 }
             }
         },
-        "/auth/reset-password": {
+        "/reset-password": {
             "post": {
                 "description": "Reset the user's password",
                 "consumes": [
@@ -187,27 +208,6 @@
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/health": {
-            "get": {
-                "description": "Check the health of the service",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "health"
-                ],
-                "summary": "Health Check",
                 "responses": {
                     "200": {
                         "description": "OK",

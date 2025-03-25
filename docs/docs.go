@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/forgot-password": {
+        "/forgot-password": {
             "post": {
                 "description": "Request a password reset",
                 "consumes": [
@@ -50,7 +50,28 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/login": {
+        "/health": {
+            "get": {
+                "description": "Check the health of the service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health Check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
             "post": {
                 "description": "Authenticate a user",
                 "consumes": [
@@ -84,7 +105,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/logout": {
+        "/logout": {
             "post": {
                 "security": [
                     {
@@ -110,7 +131,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/me": {
+        "/me": {
             "get": {
                 "security": [
                     {
@@ -135,7 +156,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/register": {
+        "/register": {
             "post": {
                 "description": "Register a new user",
                 "consumes": [
@@ -169,7 +190,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/reset-password": {
+        "/reset-password": {
             "post": {
                 "description": "Reset the user's password",
                 "consumes": [
@@ -193,27 +214,6 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/health": {
-            "get": {
-                "description": "Check the health of the service",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "health"
-                ],
-                "summary": "Health Check",
                 "responses": {
                     "200": {
                         "description": "OK",

@@ -106,7 +106,7 @@ info:
   title: Authentication API
   version: "1.0"
 paths:
-  /auth/forgot-password:
+  /forgot-password:
     post:
       consumes:
       - application/json
@@ -129,7 +129,21 @@ paths:
       summary: Forgot password
       tags:
       - auth
-  /auth/login:
+  /health:
+    get:
+      description: Check the health of the service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Health Check
+      tags:
+      - health
+  /login:
     post:
       consumes:
       - application/json
@@ -151,7 +165,7 @@ paths:
       summary: Login user
       tags:
       - auth
-  /auth/logout:
+  /logout:
     post:
       description: Logout a user
       produces:
@@ -167,7 +181,7 @@ paths:
       summary: Logout user
       tags:
       - auth
-  /auth/me:
+  /me:
     get:
       description: Get the profile of the logged-in user
       produces:
@@ -182,7 +196,7 @@ paths:
       summary: Get user profile
       tags:
       - auth
-  /auth/register:
+  /register:
     post:
       consumes:
       - application/json
@@ -204,7 +218,7 @@ paths:
       summary: Register user
       tags:
       - auth
-  /auth/reset-password:
+  /reset-password:
     post:
       consumes:
       - application/json
@@ -227,20 +241,6 @@ paths:
       summary: Reset password
       tags:
       - auth
-  /health:
-    get:
-      description: Check the health of the service
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Health Check
-      tags:
-      - health
   /users:
     get:
       description: Get a list of all users

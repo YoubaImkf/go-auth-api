@@ -26,7 +26,7 @@ func NewAuthController(authService *service.AuthService) *AuthController {
 // @Produce      json
 // @Param        user  body  dto.RegisterRequest  true  "User"
 // @Success      201  {object}  dto.RegisterResponse
-// @Router       /auth/register [post]
+// @Router       /register [post]
 func (c *AuthController) Register(ctx *gin.Context) {
 	var registerRequest dto.RegisterRequest
 
@@ -62,7 +62,7 @@ func (c *AuthController) Register(ctx *gin.Context) {
 // @Produce      json
 // @Param        user  body  dto.LoginRequest  true  "User"
 // @Success      200  {object}  dto.LoginResponse
-// @Router       /auth/login [post]
+// @Router       /login [post]
 func (c *AuthController) Login(ctx *gin.Context) {
 	var loginRequest dto.LoginRequest
 
@@ -96,7 +96,7 @@ func (c *AuthController) Login(ctx *gin.Context) {
 // @Tags         auth
 // @Produce      json
 // @Success      200  {object}  map[string]interface{}
-// @Router       /auth/logout [post]
+// @Router       /logout [post]
 // @Security     Bearer
 func (c *AuthController) Logout(ctx *gin.Context) {
 	tokenString := ctx.GetHeader("Authorization")
@@ -125,7 +125,7 @@ func (c *AuthController) Logout(ctx *gin.Context) {
 // @Tags         auth
 // @Produce      json
 // @Success      200  {object}  dto.UserResponse
-// @Router       /auth/me [get]
+// @Router       /me [get]
 // @Security     Bearer
 func (c *AuthController) GetProfile(ctx *gin.Context) {
 	userEmail, exists := ctx.Get("user")
@@ -157,7 +157,7 @@ func (c *AuthController) GetProfile(ctx *gin.Context) {
 // @Produce      json
 // @Param        email  body  dto.ForgotPasswordRequest  true  "Email"
 // @Success      200  {object}  map[string]interface{}
-// @Router       /auth/forgot-password [post]
+// @Router       /forgot-password [post]
 func (c *AuthController) ForgotPassword(ctx *gin.Context) {
 	var forgotPasswordRequest dto.ForgotPasswordRequest
 
@@ -182,7 +182,7 @@ func (c *AuthController) ForgotPassword(ctx *gin.Context) {
 // @Produce      json
 // @Param        resetPasswordRequest  body  dto.ResetPasswordRequest  true  "Reset Password"
 // @Success      200  {object}  map[string]interface{}
-// @Router       /auth/reset-password [post]
+// @Router       /reset-password [post]
 func (c *AuthController) ResetPassword(ctx *gin.Context) {
 	var resetPasswordRequest dto.ResetPasswordRequest
 
