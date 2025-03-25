@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log"
 	"time"
+	"unicode"
 
 	"github.com/YoubaImkf/go-auth-api/internal/dto"
 	"github.com/YoubaImkf/go-auth-api/internal/model"
@@ -13,6 +14,10 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
+)
+
+const (
+	minPasswordLength = 8
 )
 
 type AuthService struct {
@@ -32,6 +37,10 @@ func NewAuthService(userRepo repository.UserRepository, blacklistRepo repository
 }
 
 func (s *AuthService) Register(registerRequest dto.RegisterRequest) (*model.User, string, string, error) {
+	if err := isPasswordValid(registerRequest.Password); err != nil {
+		return nil, "", "", err
+	}
+
 	existingUser, err := s.userRepository.FindByEmail(registerRequest.Email)
 	if err == nil && existingUser != nil {
 		return nil, "", "", errors.New("user already exists")
@@ -181,4 +190,36 @@ func (s *AuthService) generateTokens(user *model.User) (string, string, error) {
 	}
 
 	return accessTokenString, refreshTokenString, nil
+}
+
+func isPasswordValid(password string) error {
+	if len(password) < minPasswordLength {
+		return errors.New("password must be at least 8 characters long")
+	}
+
+	var (
+		hasUpper   bool
+		hasLower   bool
+		hasNumber  bool
+		hasSpecial bool
+	)
+
+	for _, char := range password {
+		switch {
+		case unicode.IsUpper(char):
+			hasUpper = true
+		case unicode.IsLower(char):
+			hasLower = true
+		case unicode.IsNumber(char):
+			hasNumber = true
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
+			hasSpecial = true
+		}
+	}
+
+	if !hasUpper || !hasLower || !hasNumber || !hasSpecial {
+		return errors.New("password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
+	}
+
+	return nil
 }
