@@ -110,7 +110,7 @@ func TestAuthService_Login(t *testing.T) {
 	authService := service.NewAuthService(mockUserRepo, mockBlacklistRepo, mockEmailService)
 
 	loginRequest := dto.LoginRequest{
-		Email:    "johndoe",
+		Email:    "john.doe@example.com",
 		Password: "password123",
 	}
 

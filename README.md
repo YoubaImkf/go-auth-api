@@ -117,5 +117,5 @@ Access the Swagger UI at `http://localhost:8080/swagger/index.html`.
 1. To run tests, use the following command:
 
     ```sh
-    go test ./...
+    go test ./test/service
     ```
