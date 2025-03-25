@@ -175,7 +175,7 @@ func (c *AuthController) ForgotPassword(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        resetPasswordRequest  body  dto.ResetPasswordRequest  true  "Reset Password"
-// @Success      200  {object}  map[string]interface{}
+// @Success      204  {object}  map[string]interface{}
 // @Router       /reset-password [post]
 func (c *AuthController) ResetPassword(ctx *gin.Context) {
 	var resetPasswordRequest dto.ResetPasswordRequest
@@ -191,5 +191,5 @@ func (c *AuthController) ResetPassword(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Password has been reset"})
+	ctx.JSON(http.StatusNoContent, gin.H{"message": "Password has been reset"})
 }
