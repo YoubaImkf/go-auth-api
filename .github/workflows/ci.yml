@@ -45,13 +45,27 @@ jobs:
       - name: Install dependencies
         run: go mod download
 
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          for i in {1..10}; do
+            pg_isready -h localhost -U ${{ secrets.DATABASE_USER }} && exit 0
+            echo "Waiting for PostgreSQL..."
+            sleep 5
+          done
+          exit 1
+        env:
+          PGPASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+        
       - name: Create test database
         run: |
-          psql -h postgres -U ${{ secrets.DATABASE_USER }} -c "CREATE DATABASE go-auth-db-test;"
+          PGPASSWORD=${{ secrets.DATABASE_PASSWORD }} createdb -h localhost -U ${{ secrets.DATABASE_USER }} go-auth-db-test
 
       - name: Run tests
         env:
-          DATABASE_HOST: postgres
+          DATABASE_HOST: localhost
           DATABASE_PORT: 5432
           POSTGRES_USER: ${{ secrets.DATABASE_USER }}
           POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
