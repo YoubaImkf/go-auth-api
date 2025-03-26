@@ -192,6 +192,10 @@ func (c *AuthController) ResetPassword(ctx *gin.Context) {
 
 	err := c.authService.ResetPassword(resetPasswordRequest)
 	if err != nil {
+		if err.Error() == "invalid or expired reset token" {
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

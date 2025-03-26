@@ -156,6 +156,10 @@ func (s *AuthService) ResetPassword(resetPasswordRequest dto.ResetPasswordReques
 		return err
 	}
 
+	if err := s.userRepository.InvalidateResetToken(resetPasswordRequest.Token); err != nil {
+		return err
+	}
+
 	return nil
 }
 
