@@ -121,8 +121,8 @@ const docTemplate = `{
                 ],
                 "summary": "Logout user",
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "204": {
+                        "description": "No Content",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -186,6 +186,13 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.RegisterResponse"
                         }
+                    },
+                    "409": {
+                        "description": "User already exists",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
                     }
                 }
             }
@@ -232,8 +239,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "204": {
+                        "description": "No Content",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -296,10 +303,10 @@ const docTemplate = `{
         "dto.LoginResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "refresh_token": {
                     "type": "string"
                 },
-                "refresh_token": {
+                "token": {
                     "type": "string"
                 },
                 "user": {
@@ -330,10 +337,10 @@ const docTemplate = `{
         "dto.RegisterResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "refresh_token": {
                     "type": "string"
                 },
-                "refresh_token": {
+                "token": {
                     "type": "string"
                 },
                 "user": {

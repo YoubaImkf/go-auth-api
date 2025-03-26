@@ -115,8 +115,8 @@
                 ],
                 "summary": "Logout user",
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "204": {
+                        "description": "No Content",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -180,6 +180,13 @@
                         "schema": {
                             "$ref": "#/definitions/dto.RegisterResponse"
                         }
+                    },
+                    "409": {
+                        "description": "User already exists",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
                     }
                 }
             }
@@ -226,8 +233,8 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "204": {
+                        "description": "No Content",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -290,10 +297,10 @@
         "dto.LoginResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "refresh_token": {
                     "type": "string"
                 },
-                "refresh_token": {
+                "token": {
                     "type": "string"
                 },
                 "user": {
@@ -324,10 +331,10 @@
         "dto.RegisterResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "refresh_token": {
                     "type": "string"
                 },
-                "refresh_token": {
+                "token": {
                     "type": "string"
                 },
                 "user": {

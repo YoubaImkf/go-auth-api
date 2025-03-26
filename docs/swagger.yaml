@@ -19,9 +19,9 @@ definitions:
     type: object
   dto.LoginResponse:
     properties:
-      access_token:
-        type: string
       refresh_token:
+        type: string
+      token:
         type: string
       user:
         $ref: '#/definitions/dto.UserResponse'
@@ -42,9 +42,9 @@ definitions:
     type: object
   dto.RegisterResponse:
     properties:
-      access_token:
-        type: string
       refresh_token:
+        type: string
+      token:
         type: string
       user:
         $ref: '#/definitions/dto.UserResponse'
@@ -148,8 +148,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
           schema:
             additionalProperties: true
             type: object
@@ -192,6 +192,11 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/dto.RegisterResponse'
+        "409":
+          description: User already exists
+          schema:
+            additionalProperties: true
+            type: object
       summary: Register user
       tags:
       - auth
@@ -221,8 +226,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
           schema:
             additionalProperties: true
             type: object
